@@ -35,6 +35,7 @@ class PlaybackService : MediaSessionService() {
   private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
   private var sleepTimerJob: Job? = null
   private var sleepTimerEndElapsedMs: Long = 0L
+  private var currentAudioSessionId: Int = C.AUDIO_SESSION_ID_UNSET
 
   override fun onCreate() {
     super.onCreate()
@@ -51,6 +52,17 @@ class PlaybackService : MediaSessionService() {
         .setHandleAudioBecomingNoisy(true)
         .setWakeMode(C.WAKE_MODE_LOCAL)
         .build()
+
+    currentAudioSessionId = player.audioSessionId
+
+    player.addListener(
+      object : Player.Listener {
+        override fun onAudioSessionIdChanged(audioSessionId: Int) {
+          currentAudioSessionId = audioSessionId
+          publishSessionExtras()
+        }
+      }
+    )
 
     val launchIntent =
       Intent(this, MainActivity::class.java).apply {
@@ -75,6 +87,8 @@ class PlaybackService : MediaSessionService() {
         .setSessionActivity(sessionActivityPendingIntent)
         .setCallback(AlunanSessionCallback())
         .build()
+
+    publishSessionExtras()
   }
 
   override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
@@ -108,24 +122,28 @@ class PlaybackService : MediaSessionService() {
     sleepTimerJob?.cancel()
     if (minutes <= 0) {
       sleepTimerEndElapsedMs = 0L
-      publishSleepTimerExtra()
+      publishSessionExtras()
       return
     }
     val durationMs = minutes * 60_000L
     sleepTimerEndElapsedMs = SystemClock.elapsedRealtime() + durationMs
-    publishSleepTimerExtra()
+    publishSessionExtras()
 
     sleepTimerJob =
       serviceScope.launch {
         delay(durationMs)
         mediaSession?.player?.pause()
         sleepTimerEndElapsedMs = 0L
-        publishSleepTimerExtra()
+        publishSessionExtras()
       }
   }
 
-  private fun publishSleepTimerExtra() {
-    val extras = Bundle().apply { putLong(EXTRA_SLEEP_TIMER_END_MS, sleepTimerEndElapsedMs) }
+  private fun publishSessionExtras() {
+    val extras =
+      Bundle().apply {
+        putLong(EXTRA_SLEEP_TIMER_END_MS, sleepTimerEndElapsedMs)
+        putInt(EXTRA_AUDIO_SESSION_ID, currentAudioSessionId)
+      }
     mediaSession?.setSessionExtras(extras)
   }
 
@@ -137,6 +155,7 @@ class PlaybackService : MediaSessionService() {
       val sessionCommands =
         MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
           .add(SessionCommand(COMMAND_SET_SLEEP_TIMER, Bundle.EMPTY))
+          .add(SessionCommand(COMMAND_SET_VOLUME_SCALE, Bundle.EMPTY))
           .build()
       return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
         .setAvailableSessionCommands(sessionCommands)
@@ -149,14 +168,24 @@ class PlaybackService : MediaSessionService() {
       customCommand: SessionCommand,
       args: Bundle,
     ): ListenableFuture<SessionResult> {
-      if (customCommand.customAction == COMMAND_SET_SLEEP_TIMER) {
-        val minutes = args.getInt(ARG_SLEEP_MINUTES, 0)
-        setSleepTimer(minutes)
-        val resultBundle =
-          Bundle().apply { putLong(EXTRA_SLEEP_TIMER_END_MS, sleepTimerEndElapsedMs) }
-        return ImmediateListenableFuture(SessionResult(SessionResult.RESULT_SUCCESS, resultBundle))
+      return when (customCommand.customAction) {
+        COMMAND_SET_SLEEP_TIMER -> {
+          val minutes = args.getInt(ARG_SLEEP_MINUTES, 0)
+          setSleepTimer(minutes)
+          val resultBundle =
+            Bundle().apply {
+              putLong(EXTRA_SLEEP_TIMER_END_MS, sleepTimerEndElapsedMs)
+              putInt(EXTRA_AUDIO_SESSION_ID, currentAudioSessionId)
+            }
+          ImmediateListenableFuture(SessionResult(SessionResult.RESULT_SUCCESS, resultBundle))
+        }
+        COMMAND_SET_VOLUME_SCALE -> {
+          val vol = args.getFloat(ARG_VOLUME_SCALE, 1.0f).coerceIn(0.2f, 1.0f)
+          session.player.volume = vol
+          ImmediateListenableFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+        }
+        else -> ImmediateListenableFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
       }
-      return ImmediateListenableFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
     }
   }
 
@@ -178,7 +207,10 @@ class PlaybackService : MediaSessionService() {
 
   companion object {
     const val COMMAND_SET_SLEEP_TIMER = "com.example.alunan.SET_SLEEP_TIMER"
+    const val COMMAND_SET_VOLUME_SCALE = "com.example.alunan.SET_VOLUME_SCALE"
     const val ARG_SLEEP_MINUTES = "minutes"
+    const val ARG_VOLUME_SCALE = "volume_scale"
     const val EXTRA_SLEEP_TIMER_END_MS = "sleep_timer_end_ms"
+    const val EXTRA_AUDIO_SESSION_ID = "audio_session_id"
   }
 }

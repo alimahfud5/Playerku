@@ -6,57 +6,102 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val AlunanDarkColorScheme =
+enum class AppThemeMode(val displayName: String) {
+  SONIC_NOIR("Gelap (Sonic Noir)"),
+  MIDNIGHT("Gelap Pekat (Midnight)"),
+  LIGHT("Terang"),
+}
+
+private val SonicNoirColorScheme =
   darkColorScheme(
-    primary = CoralAmber,
-    onPrimary = ObsidianBg,
-    primaryContainer = CoralAmberDark,
-    onPrimaryContainer = WarmGold,
-    secondary = WarmGold,
-    onSecondary = ObsidianBg,
-    secondaryContainer = WarmGoldDark,
-    onSecondaryContainer = WarmGold,
-    tertiary = TealMist,
-    onTertiary = ObsidianBg,
-    background = ObsidianBg,
-    onBackground = IvoryText,
-    surface = SlateSurface,
-    onSurface = IvoryText,
-    surfaceVariant = SurfaceCard,
-    onSurfaceVariant = WarmGrayText,
-    surfaceContainerLowest = ObsidianBg,
-    surfaceContainerLow = SlateSurface,
-    surfaceContainer = SurfaceCard,
-    surfaceContainerHigh = SurfaceCardElevated,
-    outline = OutlineSubtle,
-    error = DangerRose,
-    onError = ObsidianBg,
+    primary = IndigoAccent,
+    onPrimary = Color.White,
+    primaryContainer = IndigoContainer,
+    onPrimaryContainer = IndigoOnContainer,
+    secondary = IndigoBright,
+    onSecondary = SonicBg,
+    secondaryContainer = SonicCardElevated,
+    onSecondaryContainer = TextPrimary,
+    tertiary = MintGreen,
+    onTertiary = SonicBg,
+    background = SonicBg,
+    onBackground = TextPrimary,
+    surface = SonicSurface,
+    onSurface = TextPrimary,
+    surfaceVariant = SonicCard,
+    onSurfaceVariant = TextSecondary,
+    surfaceContainerLowest = SonicBg,
+    surfaceContainerLow = SonicSurface,
+    surfaceContainer = SonicCard,
+    surfaceContainerHigh = SonicCardElevated,
+    outline = SonicOutline,
+    error = HeartPink,
+    onError = Color.White,
+  )
+
+private val MidnightColorScheme =
+  darkColorScheme(
+    primary = IndigoAccent,
+    onPrimary = Color.White,
+    primaryContainer = IndigoContainer,
+    onPrimaryContainer = IndigoOnContainer,
+    secondary = IndigoBright,
+    onSecondary = MidnightBg,
+    secondaryContainer = MidnightCardElevated,
+    onSecondaryContainer = TextPrimary,
+    tertiary = MintGreen,
+    onTertiary = MidnightBg,
+    background = MidnightBg,
+    onBackground = TextPrimary,
+    surface = MidnightSurface,
+    onSurface = TextPrimary,
+    surfaceVariant = MidnightCard,
+    onSurfaceVariant = TextSecondary,
+    surfaceContainerLowest = MidnightBg,
+    surfaceContainerLow = MidnightSurface,
+    surfaceContainer = MidnightCard,
+    surfaceContainerHigh = MidnightCardElevated,
+    outline = SonicOutline,
+    error = HeartPink,
+    onError = Color.White,
   )
 
 private val AlunanLightColorScheme =
   lightColorScheme(
-    primary = CoralDeep,
-    onPrimary = CreamSurface,
-    primaryContainer = Color(0xFFFFDBD0),
-    onPrimaryContainer = Color(0xFF3E1200),
-    secondary = Color(0xFFB37422),
-    onSecondary = CreamSurface,
-    tertiary = Color(0xFF0E7C78),
-    background = CreamBg,
-    onBackground = CharcoalText,
-    surface = CreamSurface,
-    onSurface = CharcoalText,
-    surfaceVariant = CreamCard,
-    onSurfaceVariant = CharcoalMuted,
-    outline = Color(0xFFDCD6CC),
+    primary = Color(0xFF4F58E8),
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFFE0E2FF),
+    onPrimaryContainer = Color(0xFF14186B),
+    secondary = Color(0xFF5A62D6),
+    onSecondary = Color.White,
+    tertiary = Color(0xFF0E9F6E),
+    onTertiary = Color.White,
+    background = LightBg,
+    onBackground = LightTextPrimary,
+    surface = LightSurface,
+    onSurface = LightTextPrimary,
+    surfaceVariant = LightCard,
+    onSurfaceVariant = LightTextSecondary,
+    surfaceContainerLowest = LightSurface,
+    surfaceContainerLow = LightBg,
+    surfaceContainer = LightCard,
+    surfaceContainerHigh = LightCardElevated,
+    outline = LightOutline,
+    error = Color(0xFFD93855),
+    onError = Color.White,
   )
 
 @Composable
 fun AlunanTheme(
-  darkTheme: Boolean = true,
+  themeMode: AppThemeMode = AppThemeMode.SONIC_NOIR,
   content: @Composable () -> Unit,
 ) {
-  val colorScheme = if (darkTheme) AlunanDarkColorScheme else AlunanLightColorScheme
+  val colorScheme =
+    when (themeMode) {
+      AppThemeMode.SONIC_NOIR -> SonicNoirColorScheme
+      AppThemeMode.MIDNIGHT -> MidnightColorScheme
+      AppThemeMode.LIGHT -> AlunanLightColorScheme
+    }
 
   MaterialTheme(
     colorScheme = colorScheme,
