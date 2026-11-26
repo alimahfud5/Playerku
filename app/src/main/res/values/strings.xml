@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alunan</string>
+    <string name="tab_library">Pustaka</string>
+    <string name="tab_favorites">Favorit</string>
+    <string name="tab_queue">Antrean</string>
+    <string name="now_playing">Sedang Diputar</string>
+    <string name="background_active">Berjalan di Latar Belakang</string>
+    <string name="background_ready">Siap Diputar di Latar Belakang</string>
+    <string name="add_local_audio">Tambah Musik Lokal</string>
+    <string name="import_audio_hint">Pilih file MP3, WAV, M4A, FLAC, atau OGG dari perangkat</string>
+    <string name="play_all">Putar Semua</string>
+    <string name="shuffle">Acak</string>
+    <string name="repeat">Ulangi</string>
+    <string name="sleep_timer">Timer Tidur</string>
+    <string name="sleep_timer_off">Mati</string>
+    <string name="sleep_timer_minutes">%d menit</string>
+    <string name="playback_speed">Kecepatan</string>
+    <string name="empty_favorites_title">Belum ada lagu favorit</string>
+    <string name="empty_favorites_desc">Ketuk ikon hati pada lagu untuk menyimpannya di sini agar mudah diputar kapan saja.</string>
+    <string name="empty_queue_title">Antrean kosong</string>
+    <string name="empty_queue_desc">Pilih lagu dari pustaka untuk mulai memutar musik di latar belakang.</string>
+    <string name="notification_permission_banner">Aktifkan izin notifikasi agar kontrol pemutar musik muncul di bilah status saat aplikasi di latar belakang.</string>
+    <string name="allow_notification">Aktifkan</string>
+    <string name="cd_album_art">Sampul album %1$s</string>
+    <string name="cd_play_pause">Putar atau jeda</string>
+    <string name="cd_previous">Lagu sebelumnya</string>
+    <string name="cd_next">Lagu berikutnya</string>
+    <string name="cd_favorite">Tandai favorit</string>
+    <string name="cd_minimize">Tutup layar pemutar penuh</string>
+    <string name="cd_delete_track">Hapus lagu lokal</string>
+    <string name="track_added_count">%d lagu berhasil ditambahkan</string>
+    <string name="playback_channel_name">Pemutaran Musik</string>
+</resources>

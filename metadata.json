@@ -1,0 +1,6 @@
+{
+  "name": "Alunan",
+  "description": "Pemutar musik latar belakang dengan kontrol notifikasi media, equalizer visual, timer tidur, dan dukungan berkas audio lokal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
